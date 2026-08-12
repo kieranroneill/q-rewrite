@@ -9,7 +9,7 @@
 </h1>
 
 <p align="center">
-  We investigate whether a verifier-mediated small language model (SLM) can reduce the hardware-aware cost of QAOA circuits through compiler-like rewrites, with a target of achieving at least a 10% hardware-aware cost reduction.
+  Uses a small language model (SLM) to produce compiler-like rewrites using verifier-mediated tools to reduce the hardware-aware cost of QAOA circuits
 </p>
 
 ---
@@ -27,6 +27,8 @@
 
 ## 🔭 1. Overview
 
+### 1.1. Abstract
+
 TBC...
 
 <sup>[Back to top ^][table-of-contents]</sup>
@@ -37,12 +39,18 @@ TBC...
 
 #### 2.1.1. Requirements
 
-- [Python v3.11+](https://www.python.org/downloads/)
+- [Python v3.13+](https://www.python.org/downloads/)
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
 
 <sup>[Back to top ^][table-of-contents]</sup>
 
 #### 2.1.2. Setup
+
+1. Set up the Python virtual environment and install dependencies:
+
+```shell
+uv sync
+```
 
 <sup>[Back to top ^][table-of-contents]</sup>
 
@@ -50,9 +58,9 @@ TBC...
 
 ### 3.1. Useful commands
 
-| Command | Description                                                          |
-|---------|----------------------------------------------------------------------|
-| `uv`    | Runs the platform in development mode via Docker.                    |
+| Command   | Description                                            |
+|-----------|--------------------------------------------------------|
+| `uv sync` | Sets up virtual environment and installs dependencies. |
 
 <sup>[Back to top ^][table-of-contents]</sup>
 

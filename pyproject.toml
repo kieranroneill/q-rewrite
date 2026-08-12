@@ -1,0 +1,17 @@
+[project]
+name = "q-rewrite"
+version = "1.0.0"
+description = "Uses a small language model (SLM) to produce compiler-like rewrites using verifier-mediated tools to reduce the hardware-aware cost of QAOA circuits."
+readme = "README.md"
+authors = [
+    { name = "Kieran O'Neill", email = "hello@kieranoneill.com" }
+]
+requires-python = ">=3.13"
+dependencies = []
+
+[project.scripts]
+q-rewrite = "q_rewrite:main"
+
+[build-system]
+requires = ["uv_build>=0.12.1,<0.13.0"]
+build-backend = "uv_build"
