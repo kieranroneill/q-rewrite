@@ -1,0 +1,25 @@
+services:
+  ollama:
+    build:
+      context: ../
+      dockerfile: ./build/package/ollama/Dockerfile.development
+    container_name: q_rewrite_model_dev
+    environment:
+      MODEL: ${MODEL:-qwen2.5:3b}
+    healthcheck:
+      test: ['CMD', 'curl', '-fsS', 'http://127.0.0.1:11434/api/tags']
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    image: q-rewrite-ollama:development
+    networks:
+      - q_rewrite_network_dev
+    ports:
+      - '11434:11434'
+    volumes:
+      - ../.ollama:/root/.ollama
+
+networks:
+  q_rewrite_network_dev:
+    name: q_rewrite_network_dev

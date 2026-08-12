@@ -21,9 +21,12 @@
   - [2.1. Manual](#21-manual)
     - [2.1.1. Requirements](#211-requirements)
     - [2.1.2. Setup](#212-setup)
-* [3. Appendix](#-3-appendix)
-  - [3.1. Useful commands](#31-useful-commands)
-* [4. License](#-4-license)
+* [3. Development](#-3-development)
+    - [3.1. Requirements](#31-requirements)
+    - [3.2. Starting Model Locally](#32-starting-model-locally)
+* [4. Appendix](#-4-appendix)
+  - [4.1. Useful commands](#41-useful-commands)
+* [5. License](#-5-license)
 
 ## 🔭 1. Overview
 
@@ -54,17 +57,46 @@ uv sync
 
 <sup>[Back to top ^][table-of-contents]</sup>
 
-## 📑 3. Appendix
+## 🛠️ 3. Development
 
-### 3.1. Useful commands
+### 3.1. Requirements
 
-| Command   | Description                                            |
-|-----------|--------------------------------------------------------|
-| `uv sync` | Sets up virtual environment and installs dependencies. |
+- [Docker](https://docs.docker.com/engine/install/)
 
 <sup>[Back to top ^][table-of-contents]</sup>
 
-## 📄 4. License
+### 3.2. Starting Model Locally
+
+To start the model locally via Docker, simply run:
+
+```shell
+./scripts/start_model.sh
+```
+
+> ⚠️ **NOTE:** The default model used is the model declared in [`.env.dev`](./.env.dev) in the `MODEL` value.
+
+ To use a different model, pass the model as a parameter:
+
+```shell
+./scripts/start_model.sh "qwen2.5:7b"
+```
+
+> 💡 **TIP:** For a list of available models, see Ollama's [model library](https://ollama.com/library).
+
+<sup>[Back to top ^][table-of-contents]</sup>
+
+## 📑 4. Appendix
+
+### 4.1. Useful commands
+
+| Command                    | Description                                            |
+|----------------------------|--------------------------------------------------------|
+| `./scripts/start_model.sh` | Starts the model locally via Docker.                   |
+| `uv sync`                  | Sets up virtual environment and installs dependencies. |
+
+<sup>[Back to top ^][table-of-contents]</sup>
+
+## 📄 5. License
 
 Please refer to the [LICENSE][license] file.
 
