@@ -21,6 +21,25 @@ class QiskitParser(BaseParser):
         circuit: qiskit.QuantumCircuit,
         instruction: ModelCircuitInstructionDTO,
     ) -> None:
+        """
+        Append one model instruction to a Qiskit quantum circuit.
+
+        Gate names are normalized to lowercase. Numeric parameter expressions
+        are converted through `_parse_parameter`, and qubit indexes are
+        validated before the corresponding Qiskit gate method is called.
+
+        Args:
+            circuit (qiskit.QuantumCircuit): Circuit receiving the instruction.
+            instruction (ModelCircuitInstructionDTO): Model instruction to add.
+
+        Returns:
+            None: The circuit is modified in place.
+
+        Raises:
+            ValueError: If the instruction contains an invalid qubit index,
+                unsupported gate, unsupported parameter expression, or an
+                incorrect number of parameters.
+        """
         gate = instruction.gate.lower()
         qubits = instruction.qubits
         parameters = [
@@ -139,11 +158,33 @@ class QiskitParser(BaseParser):
     @staticmethod
     def _parse_parameter(value: str) -> float:
         """
-        Parse safe numeric expressions such as:
+        Parse a restricted numeric quantum-gate parameter expression.
+
+        Supported expressions include numeric literals, the constants `pi`,
+        `tau`, and `e`, unary plus and minus, and the binary operators
+        addition, subtraction, multiplication, division, and exponentiation.
+
+        Examples of supported expressions include:
+
             0.5
             -0.25
             pi / 2
             2 * pi
+            (pi / 4) + 0.1
+
+        The expression is evaluated using an explicit AST allowlist rather
+        than Python's eval function.
+
+        Args:
+            value (str): Numeric parameter expression.
+
+        Returns:
+            float: Evaluated numeric parameter value.
+
+        Raises:
+            ValueError: If the expression is empty, contains an unsupported
+                name or operator, or is not a supported numeric expression.
+            SyntaxError: If the value cannot be parsed as a Python expression.
         """
         expression = value.strip()
 
@@ -225,6 +266,20 @@ class QiskitParser(BaseParser):
         circuit: qiskit.QuantumCircuit,
         instruction: ModelCircuitInstructionDTO,
     ) -> None:
+        """
+        Validate that all instruction qubit indexes exist in the circuit.
+
+        Args:
+            circuit (qiskit.QuantumCircuit): Circuit whose qubit range is used.
+            instruction (ModelCircuitInstructionDTO): Instruction to validate.
+
+        Returns:
+            None: The method returns normally when all indexes are valid.
+
+        Raises:
+            ValueError: If a qubit index is negative or greater than or equal
+                to the circuit's number of qubits.
+        """
         for qubit in instruction.qubits:
             if qubit < 0 or qubit >= circuit.num_qubits:
                 raise ValueError(f'invalid qubit index "{qubit}" for gate {instruction.gate!r}')
@@ -235,6 +290,29 @@ class QiskitParser(BaseParser):
 
     @staticmethod
     def from_qiskit_circuit(circuit: qiskit.QuantumCircuit) -> "QiskitParser":
+        """
+        Create a parser from a Qiskit quantum circuit.
+
+        Each Qiskit instruction is converted into a
+        ModelCircuitInstructionDTO. Instruction indexes follow the order of
+        `circuit.data`, and qubit indexes are converted from Qiskit's qubit
+        objects into integer positions.
+
+        Gate parameters are converted to strings. This preserves their textual
+        representation for model prompting, but symbolic parameter identity
+        is not preserved.
+
+        Args:
+            circuit (qiskit.QuantumCircuit): Source Qiskit circuit.
+
+        Returns:
+            QiskitParser: Parser containing the model representation of the
+                supplied circuit.
+
+        Raises:
+            ValueError: If the circuit contains unsupported data that cannot be
+                converted into the model representation.
+        """
         instructions: list[ModelCircuitInstructionDTO] = []
 
         for index, item in enumerate(circuit.data):
@@ -263,6 +341,23 @@ class QiskitParser(BaseParser):
     ##
 
     def to_qiskit_circuit(self) -> qiskit.QuantumCircuit:
+        """
+         Reconstruct a Qiskit circuit from the model circuit DTO.
+
+         A new QuantumCircuit is created with the number of qubits stored in
+         the model representation. Instructions are appended in DTO order and
+         are validated before being added.
+
+         The original model circuit and its instructions are not modified.
+
+         Returns:
+             qiskit.QuantumCircuit: Reconstructed Qiskit circuit.
+
+         Raises:
+             ValueError: If an instruction contains an invalid qubit index,
+                 unsupported gate, unsupported parameter expression, or an
+                 invalid parameter count.
+         """
         circuit = qiskit.QuantumCircuit(
             self._circuit.num_qubits,
         )
