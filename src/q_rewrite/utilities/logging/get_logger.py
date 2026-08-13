@@ -1,12 +1,5 @@
-import logging
+from q_rewrite.enums import LogLevelEnum
+from q_rewrite.tools import Logger
 
-
-def get_logger() -> logging.Logger:
-    logger = logging.getLogger(__name__)
-
-    logging.basicConfig(level=logging.INFO)
-
-    for handler in logger.handlers:
-        handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(filename)s:%(lineno)d %(message)s"))
-
-    return logger
+def get_logger() -> Logger:
+    return Logger(level=LogLevelEnum.DEBUG)
