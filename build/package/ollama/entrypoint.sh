@@ -25,6 +25,7 @@ function main() {
   local host
   local model
   local ready
+  local model_exists
 
   model="${OLLAMA_MODEL:-qwen2.5-coder:3b}"
   host="${OLLAMA_HOST:-0.0.0.0:11434}"
@@ -53,11 +54,14 @@ function main() {
     exit 1
   fi
 
-  if ! curl -fsS "${healthcheck_url}" | jq -e --arg model "${model}" '.models[] | select(.name == $model)' >/dev/null; then
+  # check if the requested model exists
+  model_exists=$(curl -fsS "${healthcheck_url}" | jq -e --arg model "${model}" '.models[] | select(.name == $model)' >/dev/null && echo "yes" || echo "no")
+
+  if [[ "${model_exists}" != "yes" ]]; then
     printf "%b pulling model \"%s\"\n" "${INFO_PREFIX}" "${model}"
     /bin/ollama pull "${model}"
   else
-    printf "%b model \"%s\" already present \n" "${INFO_PREFIX}" "${model}"
+    printf "%b model \"%s\" already present\n" "${INFO_PREFIX}" "${model}"
   fi
 
   printf "%b restarting ollama in foreground...\n" "${INFO_PREFIX}"
@@ -67,4 +71,4 @@ function main() {
 }
 
 # and so, it begins...
-main
+main "$@"

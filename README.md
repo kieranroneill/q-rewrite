@@ -62,24 +62,22 @@ uv sync
 ### 3.1. Requirements
 
 - [Docker](https://docs.docker.com/engine/install/)
+- [Python v3.13+](https://www.python.org/downloads/)
+- [uv](https://docs.astral.sh/uv/getting-started/installation/)
 
 <sup>[Back to top ^][table-of-contents]</sup>
 
 ### 3.2. Starting Model Locally
 
-To start the model locally via Docker, simply run:
+To start the model locally via Docker run:
 
 ```shell
-./scripts/start_model.sh
+uv run ./scripts/start_model.py
 ```
 
-> ⚠️ **NOTE:** The default model used is the model declared in [`.env.dev`](./.env.dev) in the `MODEL` value.
+> ⚠️ **NOTE:** The default model used is the model declared in [`.env.dev`](./.env.dev) in the `OLLAMA_MODEL` value.
 
- To use a different model, pass the model as a parameter:
-
-```shell
-./scripts/start_model.sh "qwen2.5:7b"
-```
+To use a different model, create an `.env` file (use [`.env.example`](./.env.example) as a reference) and change the `OLLAMA_MODEL` value to the desired model.
 
 > 💡 **TIP:** For a list of available models, see Ollama's [model library](https://ollama.com/library).
 
@@ -89,10 +87,10 @@ To start the model locally via Docker, simply run:
 
 ### 4.1. Useful commands
 
-| Command                    | Description                                            |
-|----------------------------|--------------------------------------------------------|
-| `./scripts/start_model.sh` | Starts the model locally via Docker.                   |
-| `uv sync`                  | Sets up virtual environment and installs dependencies. |
+| Command                           | Description                                            |
+|-----------------------------------|--------------------------------------------------------|
+| `uv run ./scripts/start_model.py` | Starts the model locally via Docker.                   |
+| `uv sync`                         | Sets up virtual environment and installs dependencies. |
 
 <sup>[Back to top ^][table-of-contents]</sup>
 
