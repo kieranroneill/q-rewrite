@@ -1,24 +1,64 @@
 services:
-  ollama:
-    build:
-      context: ../
-      dockerfile: ./build/package/ollama/Dockerfile.development
-    container_name: q_rewrite_model_dev
+#  ollama:
+#    build:
+#      context: ../
+#      dockerfile: ./build/package/ollama/Dockerfile.development
+#    container_name: q_rewrite_model_dev
+#    environment:
+#      MODEL: ${MODEL:-qwen2.5-coder:3b}
+#    healthcheck:
+#      test: ['CMD', 'curl', '-fsS', 'http://127.0.0.1:11434/api/tags']
+#      interval: 10s
+#      timeout: 5s
+#      retries: 12
+#      start_period: 20s
+#    image: q-rewrite-ollama:development
+#    networks:
+#      - q_rewrite_network_dev
+#    ports:
+#      - '11434:11434'
+#    volumes:
+#      - ../.ollama:/root/.ollama
+
+  quantum_circuit_qubo_3B:
+    command:
+      - "--model"
+      - "linuzj/quantum-circuit-qubo-3B"
+      - "--served-model-name"
+      - "quantum-circuit-qubo-3B"
+      - "--dtype"
+      - "half"
+      - "--max-model-len"
+      - "512"
+      - "--max-num-seqs"
+      - "1"
+      - "--gpu-memory-utilization"
+      - "0.90"
+      - "--enforce-eager"
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "11434"
+    container_name: q_rewrite_vllm_dev
     environment:
-      MODEL: ${MODEL:-qwen2.5-coder:3b}
-    healthcheck:
-      test: ['CMD', 'curl', '-fsS', 'http://127.0.0.1:11434/api/tags']
-      interval: 10s
-      timeout: 5s
-      retries: 12
-      start_period: 20s
-    image: q-rewrite-ollama:development
+      PYTORCH_CUDA_ALLOC_CONF: expandable_segments:True
+    image: vllm/vllm-openai:latest
+    ports:
+      - "11434:11434"
+    ipc: host
+#    environment:
+#      HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN}
     networks:
       - q_rewrite_network_dev
-    ports:
-      - '11434:11434'
     volumes:
-      - ../.ollama:/root/.ollama
+      - .hf_model:/root/.cache/huggingface
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
 
 networks:
   q_rewrite_network_dev:

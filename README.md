@@ -9,7 +9,7 @@
 </h1>
 
 <p align="center">
-  Uses a small language model (SLM) to produce compiler-like rewrites using verifier-mediated tools to reduce the hardware-aware cost of QAOA circuits
+  Uses a small language model (SLM) to produce compiler-like rewrites using verifier-mediated tools to reduce the hardware-aware cost of QAOA circuits.
 </p>
 
 ---
