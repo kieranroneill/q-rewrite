@@ -5,7 +5,7 @@ import json
 from typing import Any
 
 
-@dataclass
+@dataclass(frozen=True)
 class CircuitSummaryInstructionDTO:
     gate: str
     index: int
@@ -21,4 +21,8 @@ class CircuitSummaryInstructionDTO:
         }
 
     def to_string(self) -> str:
-        return json.dumps(self.to_dict())
+        return json.dumps(
+            self.to_dict(),
+            ensure_ascii=False,
+            separators=(",", ":"),
+        )

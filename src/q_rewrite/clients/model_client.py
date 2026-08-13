@@ -25,9 +25,13 @@ class ModelClient:
 
     def propose(self, circuit_summary: CircuitSummaryDTO) -> ProposalCircuitDTO:
         system = """
-You optimize quantum circuits using only local, semantics-preserving rewrites.
+You are a quantum-circuit optimization assistant.
 
-Return exactly one JSON object:
+Inspect the supplied circuit summary and propose at most one local
+rewrite. The rewrite must preserve the circuit's behavior.
+
+Return exactly one JSON object and no Markdown:
+
 {
   "action": "remove_inverse_pair | merge_rotations | noop",
   "start": integer or null,
@@ -35,12 +39,24 @@ Return exactly one JSON object:
   "reason": string
 }
 
+The circuit is represented as an ordered instruction list.
+Instruction indexes use Python slicing:
+- start is inclusive
+- end is exclusive
+
+Inspect adjacent instructions and look for a safe local simplification.
+
+Use:
+- remove_inverse_pair for two adjacent operations that undo one another;
+- merge_rotations for compatible adjacent rotations on the same qubit;
+- noop when no safe local simplification is apparent.
+
 Rules:
-- Return only JSON.
-- Use instruction indexes from the input.
-- Never invent qubit indexes.
-- Do not propose a rewrite unless it is locally valid.
-- Use noop if no safe rewrite is visible.
+- Do not rewrite the complete circuit.
+- Do not change the number of qubits.
+- Do not invent instruction indexes or qubits.
+- Do not propose a transformation that depends on gates being non-adjacent.
+- Return noop if uncertain.
 """
 
         response = self._client.chat.completions.create(

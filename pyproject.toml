@@ -11,6 +11,7 @@ dependencies = [
     "openai>=3.0.0",
     "python-dotenv>=1.2.2",
     "qiskit>=2.5.1",
+    "qiskit-qasm3-import>=0.6.0",
 ]
 
 [project.scripts]
