@@ -2,12 +2,12 @@ import numpy as np
 import pytest
 from qiskit import QuantumCircuit
 
-from q_rewrite.tools.verifier import Verifier
+from q_rewrite.verifiers import QiskitVerifier
 
 
 @pytest.fixture
 def verifier():
-    return Verifier()
+    return QiskitVerifier()
 
 
 class TestEquivalenceSuccess:

@@ -4,36 +4,11 @@ import numpy as np
 from qiskit import QuantumCircuit
 from qiskit.quantum_info import Operator
 
+from .base_verifier import BaseVerifier
 from q_rewrite.dtos import MetricsDTO, VerificationDTO, VerificationResourceDTO
 
 
-class Verifier:
-    def __init__(self, ):
-        pass
-
-    @staticmethod
-    def cost(metrics: MetricsDTO, depth_weight: float = 1.0, swap_weight: float = 10.0, two_qubit_weight: float = 5.0) -> float:
-        """
-        Compute an abstract hardware-agnostic cost from circuit metrics.
-
-        This is a simple weighted sum of depth, two-qubit gates, and SWAPs. The weights reflect a rough priority: SWAPs
-        are most expensive, followed by two-qubit gates, then depth.
-
-        Args:
-            metrics (MetricsDTO): Abstract circuit metrics.
-            depth_weight (float): Weight for depth in the score calculation. Defaults to 1.0.
-            swap_weight (float): Weight for SWAPs in the score calculation. Defaults to 10.0.
-            two_qubit_weight (float): Weight for two-qubit gates in the score calculation. Defaults to 5.0.
-
-        Returns:
-            float: Scalar cost where lower values indicate a cheaper circuit.
-        """
-        return (
-            (depth_weight * metrics.depth) +
-            (two_qubit_weight * metrics.two_qubit_gates) +
-            (swap_weight * metrics.swaps)
-        )
-
+class QiskitVerifier(BaseVerifier[QuantumCircuit]):
     @staticmethod
     def equivalence(
         candidate_circuit: QuantumCircuit,
@@ -154,9 +129,9 @@ class Verifier:
             ValueError: If the circuit structure is invalid or cannot be measured (for example, if depth computation
             fails).
         """
-        reference_metrics = Verifier.metrics(circuit=reference_circuit)
+        reference_metrics = QiskitVerifier.metrics(circuit=reference_circuit)
         reference_resource = VerificationResourceDTO(
-            cost=Verifier.cost(
+            cost=QiskitVerifier.cost(
                 depth_weight=depth_weight,
                 metrics=reference_metrics,
                 swap_weight=swap_weight,
@@ -164,9 +139,9 @@ class Verifier:
             ),
             metrics=reference_metrics,
         )
-        candidate_metrics = Verifier.metrics(circuit=candidate_circuit)
+        candidate_metrics = QiskitVerifier.metrics(circuit=candidate_circuit)
         candidate_resource = VerificationResourceDTO(
-            cost=Verifier.cost(
+            cost=QiskitVerifier.cost(
                 depth_weight=depth_weight,
                 metrics=candidate_metrics,
                 swap_weight=swap_weight,
@@ -176,7 +151,7 @@ class Verifier:
         )
 
         try:
-            equivalent = Verifier.equivalence(reference_circuit, candidate_circuit)
+            equivalent = QiskitVerifier.equivalence(reference_circuit, candidate_circuit)
         except Exception as e:
             return VerificationDTO(
                 accepted=False,
