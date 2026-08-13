@@ -15,7 +15,7 @@ function cleanup() {
 #
 # Environment Variables
 #
-# $OLLAMA_MODEL - The model to pull and serve, defaults to "qwen2.5:3b".
+# $OLLAMA_MODEL - The model to pull and serve, defaults to "qwen2.5-coder:3b".
 #
 # Examples
 #   ./entrypoint.sh
@@ -26,7 +26,7 @@ function main() {
   local model
   local ready
 
-  model="${OLLAMA_MODEL:-qwen2.5:3b}"
+  model="${OLLAMA_MODEL:-qwen2.5-coder:3b}"
   host="${OLLAMA_HOST:-0.0.0.0:11434}"
   healthcheck_url="http://127.0.0.1:11434/api/tags"
   ready=0

@@ -5,7 +5,7 @@ services:
       dockerfile: ./build/package/ollama/Dockerfile.development
     container_name: q_rewrite_model_dev
     environment:
-      MODEL: ${MODEL:-qwen2.5:3b}
+      MODEL: ${MODEL:-qwen2.5-coder:3b}
     healthcheck:
       test: ['CMD', 'curl', '-fsS', 'http://127.0.0.1:11434/api/tags']
       interval: 10s

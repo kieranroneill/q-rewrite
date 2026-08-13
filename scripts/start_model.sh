@@ -11,7 +11,7 @@ source "${SCRIPT_DIR}/utilities/_set_vars.sh"
 # Examples
 #
 #   ./start_model.sh # reads the model in the .env.dev file
-#   ./start_model.sh "qwen2.5:7b"
+#   ./start_model.sh "qwen2.5-coder:7b"
 #
 # Returns exit code 0.
 function main() {
