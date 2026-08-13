@@ -5,20 +5,20 @@ import math
 import operator
 from typing import Any
 
-import qiskit
+from qiskit import QuantumCircuit
 
 from .base_parser import BaseParser
 from q_rewrite.dtos import ModelCircuitDTO, ModelCircuitInstructionDTO
 
 
-class QiskitParser(BaseParser):
+class QiskitParser(BaseParser[QuantumCircuit]):
     ##
     # private static methods
     ##
 
     @staticmethod
     def _append_instruction(
-        circuit: qiskit.QuantumCircuit,
+        circuit: QuantumCircuit,
         instruction: ModelCircuitInstructionDTO,
     ) -> None:
         """
@@ -29,7 +29,7 @@ class QiskitParser(BaseParser):
         validated before the corresponding Qiskit gate method is called.
 
         Args:
-            circuit (qiskit.QuantumCircuit): Circuit receiving the instruction.
+            circuit (QuantumCircuit): Circuit receiving the instruction.
             instruction (ModelCircuitInstructionDTO): Model instruction to add.
 
         Returns:
@@ -149,8 +149,7 @@ class QiskitParser(BaseParser):
 
         if len(parameters) != expected:
             raise ValueError(
-                f"{gate} requires {expected} parameters, "
-                f"received {len(parameters)}"
+                f"{gate} requires {expected} parameters, received {len(parameters)}"
             )
 
         method(*parameters, *qubits)
@@ -206,7 +205,6 @@ class QiskitParser(BaseParser):
             ast.Div: operator.truediv,
             ast.Pow: operator.pow,
         }
-
         unary_operators: dict[type[ast.unaryop], Any] = {
             ast.UAdd: operator.pos,
             ast.USub: operator.neg,
@@ -263,14 +261,14 @@ class QiskitParser(BaseParser):
 
     @staticmethod
     def _validate_qubits(
-        circuit: qiskit.QuantumCircuit,
+        circuit: QuantumCircuit,
         instruction: ModelCircuitInstructionDTO,
     ) -> None:
         """
         Validate that all instruction qubit indexes exist in the circuit.
 
         Args:
-            circuit (qiskit.QuantumCircuit): Circuit whose qubit range is used.
+            circuit (QuantumCircuit): Circuit whose qubit range is used.
             instruction (ModelCircuitInstructionDTO): Instruction to validate.
 
         Returns:
@@ -288,8 +286,8 @@ class QiskitParser(BaseParser):
     # public static methods
     ##
 
-    @staticmethod
-    def from_qiskit_circuit(circuit: qiskit.QuantumCircuit) -> "QiskitParser":
+    @classmethod
+    def from_circuit(cls, circuit: QuantumCircuit) -> "QiskitParser":
         """
         Create a parser from a Qiskit quantum circuit.
 
@@ -303,7 +301,7 @@ class QiskitParser(BaseParser):
         is not preserved.
 
         Args:
-            circuit (qiskit.QuantumCircuit): Source Qiskit circuit.
+            circuit (QuantumCircuit): Source Qiskit circuit.
 
         Returns:
             QiskitParser: Parser containing the model representation of the
@@ -340,7 +338,7 @@ class QiskitParser(BaseParser):
     # public methods
     ##
 
-    def to_qiskit_circuit(self) -> qiskit.QuantumCircuit:
+    def to_circuit(self) -> QuantumCircuit:
         """
          Reconstruct a Qiskit circuit from the model circuit DTO.
 
@@ -351,14 +349,14 @@ class QiskitParser(BaseParser):
          The original model circuit and its instructions are not modified.
 
          Returns:
-             qiskit.QuantumCircuit: Reconstructed Qiskit circuit.
+             QuantumCircuit: Reconstructed Qiskit circuit.
 
          Raises:
              ValueError: If an instruction contains an invalid qubit index,
                  unsupported gate, unsupported parameter expression, or an
                  invalid parameter count.
          """
-        circuit = qiskit.QuantumCircuit(
+        circuit = QuantumCircuit(
             self._circuit.num_qubits,
         )
 
