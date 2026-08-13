@@ -7,10 +7,10 @@ from q_rewrite.dtos import MetricsDTO, VerificationDTO
 from q_rewrite.tools import Logger
 from q_rewrite.utilities.logging import get_logger
 
-T = TypeVar("T")
+Circuit = TypeVar("Circuit")
 
 
-class BaseVerifier(ABC, Generic[T]):
+class BaseVerifier(ABC, Generic[Circuit]):
     def __init__(self, logger: Logger | None = None):
         self._logger: Logger = logger or get_logger()
 
@@ -37,24 +37,26 @@ class BaseVerifier(ABC, Generic[T]):
             (swap_weight * metrics.swaps)
         )
 
-    @staticmethod
+    @classmethod
     @abstractmethod
     def equivalence(
-        candidate_circuit: T,
-        reference_circuit: T,
+        cls,
+        candidate_circuit: Circuit,
+        reference_circuit: Circuit,
     ) -> bool:
         raise NotImplementedError
 
-    @staticmethod
+    @classmethod
     @abstractmethod
-    def metrics(circuit: T) -> MetricsDTO:
+    def metrics(cls, circuit: Circuit) -> MetricsDTO:
         raise NotImplementedError
 
-    @staticmethod
+    @classmethod
     @abstractmethod
     def verify(
-        candidate_circuit: T,
-        reference_circuit: T,
+        cls,
+        candidate_circuit: Circuit,
+        reference_circuit: Circuit,
         depth_weight: float = 1.0,
         swap_weight: float = 10.0,
         two_qubit_weight: float = 5.0

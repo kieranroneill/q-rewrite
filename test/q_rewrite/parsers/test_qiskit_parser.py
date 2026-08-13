@@ -5,8 +5,8 @@ from qiskit.quantum_info import Operator
 from q_rewrite.parsers import QiskitParser
 
 def _test_circuit_parsing(circuit: QuantumCircuit) -> tuple[QiskitParser, QuantumCircuit]:
-    parser = QiskitParser.from_qiskit_circuit(circuit)
-    reconstructed_circuit = parser.to_qiskit_circuit()
+    parser = QiskitParser.from_circuit(circuit)
+    reconstructed_circuit = parser.to_circuit()
 
     assert len(parser.circuit().instructions) == circuit.size()
     assert circuit.num_qubits == reconstructed_circuit.num_qubits

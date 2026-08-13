@@ -9,8 +9,9 @@ from q_rewrite.dtos import MetricsDTO, VerificationDTO, VerificationResourceDTO
 
 
 class QiskitVerifier(BaseVerifier[QuantumCircuit]):
-    @staticmethod
+    @classmethod
     def equivalence(
+        cls,
         candidate_circuit: QuantumCircuit,
         reference_circuit: QuantumCircuit,
     ) -> bool:
@@ -24,8 +25,8 @@ class QiskitVerifier(BaseVerifier[QuantumCircuit]):
         the exponential cost of constructing the full unitary.
 
         Args:
-            candidate_circuit (qiskit.QuantumCircuit): Candidate circuit.
-            reference_circuit (qiskit.QuantumCircuit): Reference circuit to compare.
+            candidate_circuit (QuantumCircuit): Candidate circuit.
+            reference_circuit (QuantumCircuit): Reference circuit to compare.
 
         Returns:
             bool: True if the circuits are equivalent up to global-phase, False otherwise.
@@ -63,15 +64,15 @@ class QiskitVerifier(BaseVerifier[QuantumCircuit]):
             rtol=1e-8,
         )
 
-    @staticmethod
-    def metrics(circuit: QuantumCircuit) -> MetricsDTO:
+    @classmethod
+    def metrics(cls, circuit: QuantumCircuit) -> MetricsDTO:
         """
         Compute abstract metrics for a Qiskit circuit.
 
         Counts gates, two-qubit gates, SWAPs, and computes circuit depth directly from the provided QuantumCircuit.
 
         Args:
-            circuit (qiskit.QuantumCircuit): Circuit to measure.
+            circuit (QuantumCircuit): Circuit to measure.
 
         Returns:
             MetricsDTO: Abstract metrics for the supplied circuit.
@@ -99,8 +100,9 @@ class QiskitVerifier(BaseVerifier[QuantumCircuit]):
             swaps=swaps,
         )
 
-    @staticmethod
+    @classmethod
     def verify(
+        cls,
         candidate_circuit: QuantumCircuit,
         reference_circuit: QuantumCircuit,
         depth_weight: float = 1.0,
@@ -115,8 +117,8 @@ class QiskitVerifier(BaseVerifier[QuantumCircuit]):
         accepted only if it is equivalent to the reference and the cost is lower than the reference cost.
 
         Args:
-            candidate_circuit (qiskit.QuantumCircuit): Candidate circuit to verify against the reference circuit.
-            reference_circuit (qiskit.QuantumCircuit): Reference circuit.
+            candidate_circuit (QuantumCircuit): Candidate circuit to verify against the reference circuit.
+            reference_circuit (QuantumCircuit): Reference circuit.
             depth_weight (float): Weight for depth in the score calculation. Defaults to 1.0.
             swap_weight (float): Weight for SWAPs in the score calculation. Defaults to 10.0.
             two_qubit_weight (float): Weight for two-qubit gates in the score calculation. Defaults to 5.0.
@@ -151,7 +153,7 @@ class QiskitVerifier(BaseVerifier[QuantumCircuit]):
         )
 
         try:
-            equivalent = QiskitVerifier.equivalence(reference_circuit, candidate_circuit)
+            equivalent = QiskitVerifier.equivalence(reference_circuit=reference_circuit, candidate_circuit=candidate_circuit)
         except Exception as e:
             return VerificationDTO(
                 accepted=False,
