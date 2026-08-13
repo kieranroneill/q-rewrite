@@ -1,9 +1,9 @@
-from .circuit_summary_dto import CircuitSummaryDTO
-from .circuit_summary_instruction_dto import CircuitSummaryInstructionDTO
-from .propsal_circuit_dto import ProposalCircuitDTO
+from .model_circuit_dto import ModelCircuitDTO
+from .model_circuit_instruction_dto import ModelCircuitInstructionDTO
+from .model_circuit_proposal_dto import ModelCircuitProposalDTO
 
 __all__ = [
-    "CircuitSummaryDTO",
-    "CircuitSummaryInstructionDTO",
-    "ProposalCircuitDTO",
+    "ModelCircuitDTO",
+    "ModelCircuitInstructionDTO",
+    "ModelCircuitProposalDTO",
 ]

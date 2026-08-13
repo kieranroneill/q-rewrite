@@ -6,7 +6,7 @@ from typing import Any
 
 
 @dataclass(frozen=True)
-class CircuitSummaryInstructionDTO:
+class ModelCircuitInstructionDTO:
     gate: str
     index: int
     parameters: list[str]

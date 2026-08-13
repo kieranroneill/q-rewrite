@@ -5,7 +5,7 @@ from openai import OpenAI
 from openai.types.chat import ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam
 from openai.types.shared_params import ResponseFormatJSONObject
 
-from q_rewrite.dtos import CircuitSummaryDTO, ProposalCircuitDTO
+from q_rewrite.dtos import ModelCircuitDTO, ModelCircuitProposalDTO
 from q_rewrite.utilities.logging import get_logger
 
 class ModelClient:
@@ -23,7 +23,7 @@ class ModelClient:
         self._logger = logger or get_logger()
         self._model = model
 
-    def propose(self, circuit_summary: CircuitSummaryDTO) -> ProposalCircuitDTO:
+    def propose(self, circuit: ModelCircuitDTO) -> ModelCircuitProposalDTO:
         system = """
 You are a quantum-circuit optimization assistant.
 
@@ -67,7 +67,7 @@ Rules:
                     role="system",
                 ),
                 ChatCompletionUserMessageParam(
-                    content=circuit_summary.to_string(),
+                    content=circuit.to_string(),
                     role="user",
                 ),
             ],
@@ -82,7 +82,7 @@ Rules:
         content = response.choices[0].message.content or ""
         data = json.loads(content)
 
-        return ProposalCircuitDTO(
+        return ModelCircuitProposalDTO(
             action=data.get("action", "noop"),
             end=data.get("end"),
             reason=data.get("reason", ""),

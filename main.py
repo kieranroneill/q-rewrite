@@ -5,7 +5,7 @@ import sys
 import qiskit
 
 from q_rewrite.clients import ModelClient
-from q_rewrite.tools import QiskitParser
+from q_rewrite.parsers import QiskitParser
 from q_rewrite.utilities.logging import get_logger
 from q_rewrite.utilities.os import load_env_file
 
@@ -17,14 +17,12 @@ def main(file_path: Path) -> None:
         logger=logger,
         model=os.environ["MODEL"],
     )
-    qasm = qiskit.qasm3.loads(file_path.read_text(encoding="utf-8"))
-    summarized_circuit = QiskitParser().summarize(qasm)
+    qasm = file_path.read_text(encoding="utf-8")
+    circuit = qiskit.qasm3.loads(qasm)
+    model_circuit = QiskitParser.from_qiskit_circuit(circuit)
+    result = client.propose(model_circuit.circuit())
 
-    logger.info(f"summarized circuit: {summarized_circuit.to_string()}")
-
-    result = client.propose(summarized_circuit)
-
-    logger.info(f"response: {result}")
+    logger.info(f"result: {result}")
 
 if __name__ == "__main__":
     load_env_file(project_root_path=Path(__file__).parent)

@@ -90,6 +90,7 @@ To use a different model, create an `.env` file (use [`.env.example`](./.env.exa
 | Command                           | Description                                            |
 |-----------------------------------|--------------------------------------------------------|
 | `uv run ./scripts/start_model.py` | Starts the model locally via Docker.                   |
+| `uv run pytest`                   | Run unit tests.                                        |
 | `uv sync`                         | Sets up virtual environment and installs dependencies. |
 
 <sup>[Back to top ^][table-of-contents]</sup>

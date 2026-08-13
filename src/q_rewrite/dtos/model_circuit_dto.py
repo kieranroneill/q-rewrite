@@ -4,12 +4,12 @@ from dataclasses import dataclass
 import json
 from typing import Any
 
-from .circuit_summary_instruction_dto import CircuitSummaryInstructionDTO
+from .model_circuit_instruction_dto import ModelCircuitInstructionDTO
 
 
 @dataclass(frozen=True)
-class CircuitSummaryDTO:
-    instructions: list[CircuitSummaryInstructionDTO]
+class ModelCircuitDTO:
+    instructions: list[ModelCircuitInstructionDTO]
     num_qubits: int
     has_measurements: bool = False
     num_cbits: int = 0

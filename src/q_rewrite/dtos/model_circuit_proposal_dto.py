@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class ProposalCircuitDTO:
+class ModelCircuitProposalDTO:
     action: str
     end: int | None
     reason: str
