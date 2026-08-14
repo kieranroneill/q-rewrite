@@ -3,6 +3,8 @@
 ERROR_PREFIX="\033[0;31m[ERROR]\033[0m"
 INFO_PREFIX="\033[1;33m[INFO]\033[0m"
 
+source "/add_external_model.sh"
+
 # Private: Stops the background Ollama process if it is running.
 function cleanup() {
   if kill -0 "${OLLAMA_PID:-0}" 2>/dev/null; then
@@ -52,6 +54,11 @@ function main() {
   if [[ "${ready}" -ne 1 ]]; then
     printf "%b ollama api did not become ready in time.\n" "${ERROR_PREFIX}" >&2
     exit 1
+  fi
+
+  # add external models
+  if [[ "${model}" == "sft_quantum_circuit_gen_8B" ]]; then
+    add_external_model "sft_quantum_circuit_gen_8B"
   fi
 
   # check if the requested model exists

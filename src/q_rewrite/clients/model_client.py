@@ -91,7 +91,11 @@ Rules:
 
     def propose_qasm(self, circuit: str) -> str | None:
             system = """
-You are a quantum circuit optimization agent.
+You are a helpful quantum circuit design assistant. Provide a
+quantum circuit in valid QASM 3.0 code with optimal gate parameters
+so that the output state encodes the solution, ensuring that the
+measurement outcomes have a high probability of reflecting the
+correct answer.
     """
 
             response = self._client.chat.completions.create(

@@ -83,6 +83,18 @@ To use a different model, create an `.env` file (use [`.env.example`](./.env.exa
 
 <sup>[Back to top ^][table-of-contents]</sup>
 
+## 3.3. Using the Trained Model (Optional)
+
+We have converted the trained model from this [paper](https://arxiv.org/html/2504.11109v2).
+
+1. reate a directory called `.models/` at the project route and download the foles from here.
+
+> 🚨 **WARNING:** The model files are ~**8GB**.
+
+2. To use the model, change the `MODEL` value in your `.env` file to `sft_quantum_circuit_gen_8B:latest`.
+
+<sup>[Back to top ^][table-of-contents]</sup>
+
 ## 📑 4. Appendix
 
 ### 4.1. Useful commands

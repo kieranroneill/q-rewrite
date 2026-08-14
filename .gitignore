@@ -319,4 +319,5 @@ cython_debug/
 
 ### Project files
 !build/
+.models/
 .ollama/
