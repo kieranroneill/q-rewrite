@@ -5,7 +5,8 @@ from openai import OpenAI
 from openai.types.chat import ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam
 from openai.types.shared_params import ResponseFormatJSONObject
 
-from q_rewrite.dtos import ModelCircuitDTO, ModelCircuitProposalDTO
+from q_rewrite.dtos import SerializedCircuitDTO, CircuitOptimizationProposalDTO
+from q_rewrite.enums import RewriteActionEnum
 from q_rewrite.utilities.logging import get_logger
 
 class ModelClient:
@@ -23,7 +24,10 @@ class ModelClient:
         self._logger = logger or get_logger()
         self._model = model
 
-    def propose(self, circuit: ModelCircuitDTO) -> ModelCircuitProposalDTO:
+    def model(self):
+        return self._model
+
+    def propose(self, circuit: SerializedCircuitDTO) -> CircuitOptimizationProposalDTO:
         system = """
 You are a quantum-circuit optimization assistant.
 
@@ -36,6 +40,7 @@ Return exactly one JSON object and no Markdown:
   "action": "remove_inverse_pair | merge_rotations | noop",
   "start": integer or null,
   "end": integer or null,
+  "parameters": object,
   "reason": string
 }
 
@@ -44,18 +49,68 @@ Instruction indexes use Python slicing:
 - start is inclusive
 - end is exclusive
 
-Inspect adjacent instructions and look for a safe local simplification.
+Allowed actions:
 
-Use:
-- remove_inverse_pair for two adjacent operations that undo one another;
-- merge_rotations for compatible adjacent rotations on the same qubit;
-- noop when no safe local simplification is apparent.
+1. remove_inverse_pair
+
+Use only for two adjacent self-inverse operations that:
+- have the same operation type;
+- act on the same qubit or qubits;
+- appear at indexes [start, end);
+- have no instruction between them.
+
+Return:
+
+{
+  "action": "remove_inverse_pair",
+  "start": integer,
+  "end": integer,
+  "parameters": {
+    "gate": "x | y | z | h | cx | cz | swap"
+  },
+  "reason": "..."
+}
+
+2. merge_rotations
+
+Use only for two adjacent single-qubit rotations that:
+- are both rx, both ry, or both rz;
+- act on the same qubit;
+- appear at indexes [start, end);
+- have no instruction between them.
+
+The resulting rotation has the sum of the two angles.
+
+Return:
+
+{
+  "action": "merge_rotations",
+  "start": integer,
+  "end": integer,
+  "parameters": {
+    "axis": "rx | ry | rz"
+  },
+  "reason": "..."
+}
+
+3. noop
+
+Use when no safe local rewrite is visible or when uncertain.
+
+Return:
+
+{
+  "action": "noop",
+  "start": null,
+  "end": null,
+  "parameters": {},
+  "reason": "..."
+}
 
 Rules:
 - Do not rewrite the complete circuit.
-- Do not change the number of qubits.
+- Do not change the number of qubits or classical bits.
 - Do not invent instruction indexes or qubits.
-- Do not propose a transformation that depends on gates being non-adjacent.
 - Return noop if uncertain.
 """
 
@@ -74,28 +129,32 @@ Rules:
             response_format=ResponseFormatJSONObject(
                 type="json_object",
             ),
-            temperature=0.2,
+            temperature=0.4,
         )
-
-        self._logger.info(f"response: {response.model_dump()}")
 
         content = response.choices[0].message.content or ""
         data = json.loads(content)
 
-        return ModelCircuitProposalDTO(
-            action=data.get("action", "noop"),
+        return CircuitOptimizationProposalDTO(
+            action=RewriteActionEnum(data.get("action", "noop")),
             end=data.get("end"),
+            parameters=data.get("parameters") or {},
             reason=data.get("reason", ""),
             start=data.get("start"),
         )
 
     def propose_qasm(self, circuit: str) -> str | None:
             system = """
-You are a helpful quantum circuit design assistant. Provide a
-quantum circuit in valid QASM 3.0 code with optimal gate parameters
-so that the output state encodes the solution, ensuring that the
-measurement outcomes have a high probability of reflecting the
-correct answer.
+You are a quantum-circuit optimization assistant.
+
+Inspect the supplied circuit and propose at most one local
+rewrite. The rewrite must preserve the circuit's behavior.
+
+Provide a quantum circuit in valid QASM 3.0 code.
+
+Rules:
+- Do not change the number of qubits.
+- Do not invent qubits.
     """
 
             response = self._client.chat.completions.create(

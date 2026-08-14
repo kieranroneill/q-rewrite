@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import json
+from typing import Any
 
 
 @dataclass
@@ -18,3 +20,18 @@ class MetricsDTO:
     swaps: int
     total_gates: int
     two_qubit_gates: int
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "depth": self.depth,
+            "swaps": self.swaps,
+            "total_gates": self.total_gates,
+            "two_qubit_gates": self.two_qubit_gates,
+        }
+
+    def to_string(self) -> str:
+        return json.dumps(
+            self.to_dict(),
+            ensure_ascii=False,
+            separators=(",", ":"),
+        )

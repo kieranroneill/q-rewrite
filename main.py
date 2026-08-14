@@ -5,22 +5,34 @@ import sys
 import qiskit
 
 from q_rewrite.clients import ModelClient
+from q_rewrite.optimizers import QiskitOptimizer
 from q_rewrite.parsers import QiskitParser
 from q_rewrite.utilities.logging import get_logger
 from q_rewrite.utilities.os import load_env_file
 
 def main(file_path: Path) -> None:
     logger = get_logger()
-    client = ModelClient(
+    model_client = ModelClient(
         api_key=os.environ["MODEL_API_KEY"],
         base_url=os.environ["MODEL_API_BASE_URL"],
         logger=logger,
         model=os.environ["MODEL"],
     )
     qasm = file_path.read_text(encoding="utf-8")
+
+    ################# QASM Circuits #################
+
+    # result = model_client.propose_qasm(qasm)
+    # logger.info(f"result: {result}")
+
+    ################# Serialized Circuits #################
+
     circuit = qiskit.qasm3.loads(qasm)
-    model_circuit = QiskitParser.from_qiskit_circuit(circuit)
-    result = client.propose(model_circuit.circuit())
+    optimizer = QiskitOptimizer(
+        model_client=model_client,
+        logger=logger,
+    )
+    result = optimizer.optimize(circuit)
 
     logger.info(f"result: {result}")
 

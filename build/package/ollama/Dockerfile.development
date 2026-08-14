@@ -7,7 +7,7 @@ RUN sed -i 's|http://archive.ubuntu.com|https://archive.ubuntu.com|g; s|http://s
     && rm -rf /var/lib/apt/lists/*
 
 # copy custom models
-COPY ./models /root/.models
+COPY ./.models /root/.models
 
 # copy scripts
 COPY ./build/package/ollama/add_external_model.sh /add_external_model.sh

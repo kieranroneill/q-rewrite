@@ -8,7 +8,7 @@ from typing import Any
 from qiskit import QuantumCircuit
 
 from .base_parser import BaseParser
-from q_rewrite.dtos import ModelCircuitDTO, ModelCircuitInstructionDTO
+from q_rewrite.dtos import SerializedCircuitDTO, SerializedCircuitInstructionDTO
 
 
 class QiskitParser(BaseParser[QuantumCircuit]):
@@ -19,7 +19,7 @@ class QiskitParser(BaseParser[QuantumCircuit]):
     @staticmethod
     def _append_instruction(
         circuit: QuantumCircuit,
-        instruction: ModelCircuitInstructionDTO,
+        instruction: SerializedCircuitInstructionDTO,
     ) -> None:
         """
         Append one model instruction to a Qiskit quantum circuit.
@@ -30,7 +30,7 @@ class QiskitParser(BaseParser[QuantumCircuit]):
 
         Args:
             circuit (QuantumCircuit): Circuit receiving the instruction.
-            instruction (ModelCircuitInstructionDTO): Model instruction to add.
+            instruction (SerializedCircuitInstructionDTO): Model instruction to add.
 
         Returns:
             None: The circuit is modified in place.
@@ -262,14 +262,14 @@ class QiskitParser(BaseParser[QuantumCircuit]):
     @staticmethod
     def _validate_qubits(
         circuit: QuantumCircuit,
-        instruction: ModelCircuitInstructionDTO,
+        instruction: SerializedCircuitInstructionDTO,
     ) -> None:
         """
         Validate that all instruction qubit indexes exist in the circuit.
 
         Args:
             circuit (QuantumCircuit): Circuit whose qubit range is used.
-            instruction (ModelCircuitInstructionDTO): Instruction to validate.
+            instruction (SerializedCircuitInstructionDTO): Instruction to validate.
 
         Returns:
             None: The method returns normally when all indexes are valid.
@@ -311,11 +311,11 @@ class QiskitParser(BaseParser[QuantumCircuit]):
             ValueError: If the circuit contains unsupported data that cannot be
                 converted into the model representation.
         """
-        instructions: list[ModelCircuitInstructionDTO] = []
+        instructions: list[SerializedCircuitInstructionDTO] = []
 
         for index, item in enumerate(circuit.data):
-            instructions.append(ModelCircuitInstructionDTO(
-                gate=item.operation.name,
+            instructions.append(SerializedCircuitInstructionDTO(
+                gate=item.operation.name.lower(),
                 index=index,
                 parameters=[
                     str(parameter)
@@ -328,7 +328,7 @@ class QiskitParser(BaseParser[QuantumCircuit]):
             ))
 
         return QiskitParser(
-            circuit=ModelCircuitDTO(
+            circuit=SerializedCircuitDTO(
                 instructions=instructions,
                 num_qubits=circuit.num_qubits,
             ),

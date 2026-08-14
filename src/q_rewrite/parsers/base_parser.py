@@ -3,16 +3,16 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Generic, Self, TypeVar
 
-from q_rewrite.dtos import ModelCircuitDTO
+from q_rewrite.dtos import SerializedCircuitDTO
 
 Circuit = TypeVar("Circuit")
 
 
 class BaseParser(ABC, Generic[Circuit]):
-    def __init__(self, circuit: ModelCircuitDTO):
-        self._circuit: ModelCircuitDTO = circuit
+    def __init__(self, circuit: SerializedCircuitDTO):
+        self._circuit: SerializedCircuitDTO = circuit
 
-    def circuit(self) -> ModelCircuitDTO:
+    def circuit(self) -> SerializedCircuitDTO:
         return self._circuit
 
     @classmethod

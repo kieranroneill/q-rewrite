@@ -4,19 +4,17 @@ from dataclasses import dataclass
 import json
 from typing import Any
 
-from .model_circuit_instruction_dto import ModelCircuitInstructionDTO
+from .serialized_circuit_instruction_dto import SerializedCircuitInstructionDTO
 
 
 @dataclass(frozen=True)
-class ModelCircuitDTO:
-    instructions: list[ModelCircuitInstructionDTO]
+class SerializedCircuitDTO:
+    instructions: list[SerializedCircuitInstructionDTO]
     num_qubits: int
-    has_measurements: bool = False
     num_cbits: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         return {
-            "has_measurements": self.has_measurements,
             "instructions": [instruction.to_dict() for instruction in self.instructions],
             "num_cbits": self.num_cbits,
             "num_qubits": self.num_qubits,
@@ -28,4 +26,3 @@ class ModelCircuitDTO:
             ensure_ascii=False,
             separators=(",", ":"),
         )
-
