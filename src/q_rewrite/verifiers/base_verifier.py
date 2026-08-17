@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from q_rewrite.dtos import MetricsDTO, VerificationDTO, VerificationResourceDTO
 from q_rewrite.tools import Logger
 from q_rewrite.utilities.logging import get_logger
+from qiskit.qasm3 import loads as loads_qasm3
 
 
 class BaseVerifier(ABC):
@@ -42,9 +43,57 @@ class BaseVerifier(ABC):
     ) -> bool:
         raise NotImplementedError
 
-    @abstractmethod
-    def metrics(self, circuit: str) -> MetricsDTO:
-        raise NotImplementedError
+    @classmethod
+    def metrics(cls, circuit: str) -> MetricsDTO:
+        """
+        Compute  metrics for a Qiskit circuit.
+
+        Counts gates, two-qubit gates, SWAPs, and computes circuit depth directly from the provided QuantumCircuit.
+
+        Args:
+            circuit (str): Circuit to measure, in QASM 3.0 format.
+
+        Returns:
+            MetricsDTO: Abstract metrics for the supplied circuit.
+
+        Raises:
+            ValueError: If the circuit structure is invalid or cannot be measured (for example, if depth computation
+            fails).
+        """
+        """
+        Compute abstract metrics for a Qiskit circuit.
+
+        Counts gates, two-qubit gates, SWAPs, and computes circuit depth directly from the provided QuantumCircuit.
+
+        Args:
+            circuit (str): Circuit to measure, in QASM 3.0 format.
+
+        Returns:
+            MetricsDTO: Abstract metrics for the supplied circuit.
+
+        Raises:
+            ValueError: If the circuit structure is invalid or cannot be measured (for example, if depth computation
+            fails).
+        """
+        _circuit = loads_qasm3(circuit)
+        two_qubit = 0
+        swaps = 0
+
+        for item in _circuit.data:
+            arity = len(item.qubits)
+
+            if arity == 2:
+                two_qubit += 1
+
+            if item.operation.name == "swap":
+                swaps += 1
+
+        return MetricsDTO(
+            depth=_circuit.depth(),
+            total_gates=_circuit.size(),
+            two_qubit_gates=two_qubit,
+            swaps=swaps,
+        )
 
     def verify(
         self,

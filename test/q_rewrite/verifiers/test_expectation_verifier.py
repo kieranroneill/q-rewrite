@@ -3,13 +3,11 @@ import pytest
 from qiskit import QuantumCircuit
 from qiskit.qasm3 import dumps as dumps_qasm3
 
-from q_rewrite.verifiers import QiskitVerifier
-
+from q_rewrite.verifiers import ExpectationVerifier
 
 @pytest.fixture
 def verifier():
-    return QiskitVerifier()
-
+    return ExpectationVerifier(["Z", "X", "Y"])
 
 class TestEquivalenceSuccess:
     def test_identity_then_removed(self, verifier):
@@ -26,7 +24,6 @@ class TestEquivalenceSuccess:
         assert result.accepted is True
         assert result.equivalent is True
         assert result.reason == "accepted"
-
 
 class TestNonEquivalentRejection:
     def test_missing_gate(self, verifier):
@@ -225,3 +222,4 @@ class TestEdgeCases:
         assert result.accepted is True
         assert result.equivalent is True
         assert result.reason == "accepted"
+
