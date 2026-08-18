@@ -1,24 +1,16 @@
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 import json
 from typing import Any
 
 
-@dataclass(frozen=True)
-class SerializedCircuitInstructionDTO:
-    gate: str
-    index: int
-    parameters: list[str]
-    qubits: list[int]
-
+@dataclass
+class BaseDTO(ABC):
+    @abstractmethod
     def to_dict(self) -> dict[str, Any]:
-        return {
-            "gate": self.gate,
-            "index": self.index,
-            "parameters": self.parameters,
-            "qubits": self.qubits
-        }
+        raise NotImplementedError
 
     def to_string(self) -> str:
         return json.dumps(

@@ -99,11 +99,12 @@ We have converted the trained model from this [paper](https://arxiv.org/html/250
 
 ### 4.1. Useful commands
 
-| Command                           | Description                                            |
-|-----------------------------------|--------------------------------------------------------|
-| `uv run ./scripts/start_model.py` | Starts the model locally via Docker.                   |
-| `uv run pytest`                   | Run unit tests.                                        |
-| `uv sync`                         | Sets up virtual environment and installs dependencies. |
+| Command                                                  | Description                                            |
+|----------------------------------------------------------|--------------------------------------------------------|
+| `uv run ./scripts/start_model.py`                        | Starts the model locally via Docker.                   |
+| `uv run example.py "./examples/<example_filename>.qasm"` | Run example QASM circuit.                              |
+| `uv run pytest`                                          | Run unit tests.                                        |
+| `uv sync`                                                | Sets up virtual environment and installs dependencies. |
 
 <sup>[Back to top ^][table-of-contents]</sup>
 

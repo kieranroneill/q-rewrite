@@ -1,8 +1,5 @@
-from .base_optimizer import BaseOptimizer
-from .qiskit_optimizer import QiskitOptimizer
+from .optimizer import Optimizer
 
 __all__ = [
-    "BaseOptimizer",
-    "QiskitOptimizer",
+    "Optimizer"
 ]
-

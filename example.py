@@ -1,14 +1,13 @@
+import json
 import os
 from pathlib import Path
 import sys
 
-import qiskit
-
 from q_rewrite.clients import ModelClient
-from q_rewrite.optimizers import QiskitOptimizer
-from q_rewrite.parsers import QiskitParser
+from q_rewrite.optimizers import Optimizer
 from q_rewrite.utilities.logging import get_logger
 from q_rewrite.utilities.os import load_env_file
+from q_rewrite.verifiers import QiskitVerifier
 
 def main(file_path: Path) -> None:
     logger = get_logger()
@@ -19,22 +18,16 @@ def main(file_path: Path) -> None:
         model=os.environ["MODEL"],
     )
     qasm = file_path.read_text(encoding="utf-8")
-
-    ################# QASM Circuits #################
-
-    # result = model_client.propose_qasm(qasm)
-    # logger.info(f"result: {result}")
-
-    ################# Serialized Circuits #################
-
-    circuit = qiskit.qasm3.loads(qasm)
-    optimizer = QiskitOptimizer(
+    optimizer = Optimizer(
         model_client=model_client,
         logger=logger,
+        verifier=QiskitVerifier(logger=logger),
     )
-    result = optimizer.optimize(circuit)
+    result = optimizer.optimize(circuit=qasm)
 
-    logger.info(f"result: {result}")
+    logger.info(f"""result:
+{json.dumps(result.to_dict(), indent=4)}
+    """)
 
 if __name__ == "__main__":
     load_env_file(project_root_path=Path(__file__).parent)

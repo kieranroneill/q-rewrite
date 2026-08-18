@@ -4,9 +4,10 @@ from dataclasses import dataclass
 import json
 from typing import Any
 
+from .base_dto import BaseDTO
 
 @dataclass
-class MetricsDTO:
+class MetricsDTO(BaseDTO):
     """
     Summarize circuit complexity by isolating the most significant metrics.
 
@@ -28,10 +29,3 @@ class MetricsDTO:
             "total_gates": self.total_gates,
             "two_qubit_gates": self.two_qubit_gates,
         }
-
-    def to_string(self) -> str:
-        return json.dumps(
-            self.to_dict(),
-            ensure_ascii=False,
-            separators=(",", ":"),
-        )

@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
+from .base_dto import BaseDTO
 from .verification_resource_dto import VerificationResourceDTO
 
 
 @dataclass
-class VerificationDTO:
+class VerificationDTO(BaseDTO):
     """
     Summarize whether a candidate circuit is equivalent to a reference circuit, whether it improves abstract resource
     metrics, and whether it should be accepted as a valid optimization proposal.
@@ -28,3 +30,12 @@ class VerificationDTO:
     equivalent: bool
     reason: str
     reference: VerificationResourceDTO
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "accepted": self.accepted,
+            "candidate": self.candidate.to_dict(),
+            "equivalent": self.equivalent,
+            "reason": self.reason,
+            "reference": self.reference.to_dict(),
+        }

@@ -1,16 +1,13 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TypeVar, Generic
 
-from q_rewrite.dtos import MetricsDTO, VerificationDTO
+from q_rewrite.dtos import MetricsDTO, VerificationDTO, VerificationResourceDTO
 from q_rewrite.tools import Logger
 from q_rewrite.utilities.logging import get_logger
 
-Circuit = TypeVar("Circuit")
 
-
-class BaseVerifier(ABC, Generic[Circuit]):
+class BaseVerifier(ABC):
     def __init__(self, logger: Logger | None = None):
         self._logger: Logger = logger or get_logger()
 
@@ -37,29 +34,104 @@ class BaseVerifier(ABC, Generic[Circuit]):
             (swap_weight * metrics.swaps)
         )
 
-    @classmethod
     @abstractmethod
     def equivalence(
-        cls,
-        candidate_circuit: Circuit,
-        reference_circuit: Circuit,
+        self,
+        candidate_circuit: str,
+        reference_circuit: str,
     ) -> bool:
         raise NotImplementedError
 
-    @classmethod
     @abstractmethod
-    def metrics(cls, circuit: Circuit) -> MetricsDTO:
+    def metrics(self, circuit: str) -> MetricsDTO:
         raise NotImplementedError
 
-    @classmethod
-    @abstractmethod
     def verify(
-        cls,
-        candidate_circuit: Circuit,
-        reference_circuit: Circuit,
+        self,
+        candidate_circuit: str,
+        reference_circuit: str,
         depth_weight: float = 1.0,
         swap_weight: float = 10.0,
         two_qubit_weight: float = 5.0
     ) -> VerificationDTO:
-        raise NotImplementedError
+        """
+        Verify a candidate circuit against a reference circuit.
+
+        This method checks unitary equivalence, compares abstract resource metrics (depth and two-qubit gate count),
+        and determines whether the candidate should be accepted as a valid optimization proposal. A candidate is
+        accepted only if it is equivalent to the reference and the cost is lower than the reference cost.
+
+        Args:
+            candidate_circuit (str): Candidate circuit, in QASM 3.0 format, to verify against the reference circuit.
+            reference_circuit (str): Reference circuit, in QASM 3.0 format.
+            depth_weight (float): Weight for depth in the score calculation. Defaults to 1.0.
+            swap_weight (float): Weight for SWAPs in the score calculation. Defaults to 10.0.
+            two_qubit_weight (float): Weight for two-qubit gates in the score calculation. Defaults to 5.0.
+
+        Returns:
+            VerificationDTO: Verification result summarizing equivalence, resource validity, acceptance, and a
+            human-readable reason.
+
+        Raises:
+            ValueError: If the circuit structure is invalid or cannot be measured (for example, if depth computation
+            fails).
+        """
+        reference_metrics = self.metrics(circuit=reference_circuit)
+        reference_resource = VerificationResourceDTO(
+            cost=BaseVerifier.cost(
+                depth_weight=depth_weight,
+                metrics=reference_metrics,
+                swap_weight=swap_weight,
+                two_qubit_weight=two_qubit_weight,
+            ),
+            metrics=reference_metrics,
+        )
+        candidate_metrics = self.metrics(circuit=candidate_circuit)
+        candidate_resource = VerificationResourceDTO(
+            cost=BaseVerifier.cost(
+                depth_weight=depth_weight,
+                metrics=candidate_metrics,
+                swap_weight=swap_weight,
+                two_qubit_weight=two_qubit_weight,
+            ),
+            metrics=candidate_metrics,
+        )
+
+        try:
+            equivalent = self.equivalence(reference_circuit=reference_circuit, candidate_circuit=candidate_circuit)
+        except Exception as e:
+            return VerificationDTO(
+                accepted=False,
+                candidate=candidate_resource,
+                equivalent=False,
+                reason=f"equivalence check failed: {e}",
+                reference=reference_resource,
+            )
+
+        # candidate is at least as good as the reference
+        valid = (
+            candidate_metrics.two_qubit_gates <= reference_metrics.two_qubit_gates
+            and candidate_metrics.depth <= reference_metrics.depth
+        )
+        # lower cost is an improvement
+        improvement = candidate_resource.cost < reference_resource.cost
+        # if the circuits are equivalent and the cost is lower, the circuit is accepted
+        accepted = equivalent and improvement
+
+        if not equivalent:
+            reason = "candidate is not equivalent"
+        elif not valid:
+            reason = "hardware metrics did not improve"
+        elif not accepted:
+            reason = "no improvement"
+        else:
+            reason = "accepted"
+
+        return VerificationDTO(
+            accepted=accepted,
+            candidate=candidate_resource,
+            equivalent=equivalent,
+            reason=reason,
+            reference=reference_resource,
+        )
 
