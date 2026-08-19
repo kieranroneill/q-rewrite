@@ -44,12 +44,12 @@ TBC...
 ```text
 .
 ├─ build/
-│   ├── package/                            <-- Docker image files and scripts/configurations for the Socker services
+│   ├── package/                            <-- Images, scripts and configurations for the Docker services
 │   │   ├── <service>/
 │   │   │   └── Dockerfile
 │   │   └── ...
 │   └── ...
-├─ deployments/                             <-- Container orchestration configurations
+├─ deployments/                             <-- Container orchestration (Docker Compose) configurations
 │   └── compose.development.yml
 ├─ examples/                                <-- QASM circuit examples
 │   ├── 01_a_very_unoptimized_circuit.qasm
@@ -76,7 +76,7 @@ TBC...
 │        └── ...
 ├── .dockerignore                           <-- Instructs Docker to ignore files/directories
 ├── .editorconfig                           <-- Platform/editor-agnostic configuration file
-├── .env.dev                                <-- Configration variables to run teh development environment
+├── .env.dev                                <-- Configration variables to run the development environment
 ├── .env.example                            <-- An explanation of the environment variables
 ├── .gitignore                              <-- Files/directories ignored in git commits
 ├── .python-version                         <-- The required Python version to run the project
@@ -159,12 +159,12 @@ To use a different model, create an `.env` file (use [`.env.example`](./.env.exa
 
 ### 4.1. Useful commands
 
-| Command                                                  | Description                                            |
-|----------------------------------------------------------|--------------------------------------------------------|
-| `uv run ./scripts/start_model.py`                        | Starts the model locally via Docker.                   |
-| `uv run example.py "./examples/<example_filename>.qasm"` | Run example QASM circuit.                              |
-| `uv run pytest`                                          | Run unit tests.                                        |
-| `uv sync`                                                | Sets up virtual environment and installs dependencies. |
+| Command                                               | Description                                            |
+|-------------------------------------------------------|--------------------------------------------------------|
+| `uv run ./scripts/start_model.py`                     | Starts the model locally via Docker.                   |
+| `uv run main.py "./examples/<example_filename>.qasm"` | Run example QASM circuit.                              |
+| `uv run pytest`                                       | Run unit tests.                                        |
+| `uv sync`                                             | Sets up virtual environment and installs dependencies. |
 
 <sup>[Back to top ^][table-of-contents]</sup>
 
