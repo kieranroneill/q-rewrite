@@ -17,7 +17,7 @@ class ModelClient:
         logger: logging.Logger | None = None,
     ):
         self._client = OpenAI(
-            base_url=f"{base_url}/v1",
+            base_url=base_url,
             api_key=api_key,
         )
         self._logger = logger or get_logger()
@@ -120,6 +120,7 @@ correctness will be checked by an external verifier.
             response_format=ResponseFormatJSONObject(
                 type="json_object",
             ),
+            stream=False,
             temperature=0.2,
         )
 
